@@ -1,3 +1,7 @@
+<script>
+    import WeatherNow from '$lib/components/WeatherNow.svelte';
+</script>
+
 <main>
-    <h1>Hello world!</h1>
+    <WeatherNow />
 </main>
