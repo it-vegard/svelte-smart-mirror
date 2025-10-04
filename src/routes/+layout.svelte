@@ -10,6 +10,7 @@
 		body {
 			background-color: #000;;
 			color: #fff;
+			font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif
 		}
 	</style>
 </svelte:head>
