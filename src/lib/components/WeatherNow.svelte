@@ -5,10 +5,11 @@
 	import { onMount } from 'svelte';
 	import Icon from './Icon.svelte';
 	import WeatherSymbolAndTemperature from './WeatherSymbolAndTemperature.svelte';
+	import WeatherDetails from './WeatherDetails.svelte';
 
 	type FormattedWeather = {
 		now: {
-			temp?: number;
+			temperature?: number;
 			symbol?: WeatherSymbolKeyT;
 			error?: string;
 		};
@@ -31,11 +32,22 @@
 		console.log('Forecast', locationForecast); // TODO: Remove when done with implementation
 		weatherData = {
 			now: {
-				temp: hasRadarCoverage(nowCastData)
+				precipitation: hasRadarCoverage(nowCastData)
+					? nowCastData.properties.timeseries[0].data.next_1_hours.details.precipitation_amount
+					: undefined,
+				temperature: hasRadarCoverage(nowCastData)
 					? nowCastData.properties.timeseries[0].data.instant.details.air_temperature
 					: undefined,
 				symbol: hasRadarCoverage(nowCastData)
 					? nowCastData.properties.timeseries[0].data.next_1_hours.summary.symbol_code
+					: undefined,
+				wind: hasRadarCoverage(nowCastData)
+					? {
+							strength: nowCastData.properties.timeseries[0].data.instant.details.wind_speed,
+							direction:
+								nowCastData.properties.timeseries[0].data.instant.details.wind_from_direction,
+							gusts: nowCastData.properties.timeseries[0].data.instant.details.wind_speed_of_gust
+						}
 					: undefined,
 				error: hasRadarCoverage(nowCastData) ? undefined : 'No radar coverage'
 			},
@@ -66,7 +78,11 @@
 		{:else}
 			<WeatherSymbolAndTemperature
 				symbol={weatherData.now.symbol}
-				temperature={weatherData.now.temp}
+				temperature={weatherData.now.temperature}
+			/>
+			<WeatherDetails
+				precipitationAmount={weatherData.now.precipitation}
+				windStrength={weatherData.now.wind?.strength}
 			/>
 		{/if}
 		<!-- Add YR weather widget for inspiration while developing my own -->
