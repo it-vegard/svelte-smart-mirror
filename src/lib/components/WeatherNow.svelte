@@ -76,14 +76,18 @@
 		{#if weatherData.now.error}
 			<p>{weatherData.now.error}</p>
 		{:else}
-			<WeatherSymbolAndTemperature
-				symbol={weatherData.now.symbol}
-				temperature={weatherData.now.temperature}
-			/>
-			<WeatherDetails
-				precipitationAmount={weatherData.now.precipitation}
-				windStrength={weatherData.now.wind?.strength}
-			/>
+			<div style="width: fit-content;">
+				<div style="display: flex; flex-direction: row; gap: 10rem; align-items: center;">
+					<WeatherSymbolAndTemperature
+						symbol={weatherData.now.symbol}
+						temperature={weatherData.now.temperature}
+					/>
+					<WeatherDetails
+						precipitationAmount={weatherData.now.precipitation}
+						windStrength={weatherData.now.wind?.strength}
+					/>
+				</div>
+			</div>
 		{/if}
 		<!-- Add YR weather widget for inspiration while developing my own -->
 		<iframe
