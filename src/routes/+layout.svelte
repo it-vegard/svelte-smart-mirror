@@ -8,9 +8,10 @@
 	<link rel="icon" href={favicon} />
 	<style>
 		body {
-			background-color: #000;;
+			background-color: #000;
 			color: #fff;
-			font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif
+			font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+			padding: 3rem;
 		}
 	</style>
 </svelte:head>
