@@ -10,11 +10,13 @@
 {#if symbol && temperature}
 	<div class="weather-symbol-and-temperature">
 		{#if symbol}
-			<Image
-				size={96}
-				src={asset(`/weather-symbols/darkmode/svg/${mapWeatherSymbolToIcon(symbol)}.svg`)}
-				alt={symbol}
-			/>
+			<div class="weather-symbol">
+				<Image
+					size={96}
+					src={asset(`/weather-symbols/darkmode/svg/${mapWeatherSymbolToIcon(symbol)}.svg`)}
+					alt={symbol}
+				/>
+			</div>
 		{/if}
 		{#if temperature}
 			<p class="weather__temperature">{Math.round(temperature)}°C</p>
@@ -35,5 +37,10 @@
 		gap: 1rem;
 		font-size: 1.2rem;
 		/* Add more styles as needed */
+	}
+	.weather-symbol {
+		width: 96px;
+		height: 96px;
+		margin-left: -23px;
 	}
 </style>
