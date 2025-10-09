@@ -144,12 +144,17 @@
 				<WeatherForecastTable {forecast} />
 			</div>
 		{/if}
+
 		<!-- Add YR weather widget for inspiration while developing my own -->
-		<iframe
-			title="Været i Østerliveien de neste 24 timene"
-			src="https://www.yr.no/nb/innhold/10-997897/card.html?mode=dark"
-			style="width: 100%; height: 372px; border: 0; border-radius: 8px;"
-		></iframe>
+		<!--
+    <div style="border: 1px solid white; margin-top: 3rem;">
+			<iframe
+				title="Været i Østerliveien de neste 24 timene"
+				src="https://www.yr.no/nb/innhold/10-997897/card.html?mode=dark"
+				style="width: 100%; height: 372px; border: 0; border-radius: 8px;"
+			/>
+		</div>
+    -->
 		<!-- End of YR weather widget -->
 	</div>
 {:else}
