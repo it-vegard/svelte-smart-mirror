@@ -6,6 +6,7 @@
 	import Icon from './Icon.svelte';
 	import WeatherSymbolAndTemperature from './WeatherSymbolAndTemperature.svelte';
 	import WeatherDetails from './WeatherDetails.svelte';
+	import WeatherForecastTable from './WeatherForecastTable.svelte';
 
 	type FormattedWeather = {
 		now: {
@@ -24,12 +25,53 @@
 	const hasRadarCoverage = (data: NowCastDataT) => data.properties.meta.radar_coverage === 'ok';
 
 	let weatherData: FormattedWeather = null;
+	let forecast: {
+		startHour: number;
+		endHour: number;
+		label: string;
+		precipitation: number | undefined;
+		symbol: string | undefined;
+		temperature: number | undefined;
+		windStrength: number | undefined;
+	}[];
 
 	onMount(async () => {
+		const currentHour = new Date().getHours();
 		const nowCastData = await fetchNowCast();
 		const locationForecast = await fetchLocationForecast();
-		console.log('NowCast', nowCastData); // TODO: Remove when done with implementation
-		console.log('Forecast', locationForecast); // TODO: Remove when done with implementation
+		// console.log('NowCast', nowCastData); // TODO: Remove when done with implementation
+		// console.log('Forecast', locationForecast); // TODO: Remove when done with implementation
+		const timeseriesHoursLookupArray = [0, 6, 12, 18, 0, 6, 12, 18, 0]; // To cover 24 hours ahead
+		const firstTimeEnd = timeseriesHoursLookupArray.find((hour) => hour >= currentHour) ?? 0;
+		forecast = [0, 1, 2, 3]
+			.map((_, index) => {
+				if (index === 0) return [currentHour, firstTimeEnd];
+				else {
+					const lookupIndex = timeseriesHoursLookupArray.indexOf(firstTimeEnd);
+					return [
+						timeseriesHoursLookupArray[lookupIndex + index - 1],
+						timeseriesHoursLookupArray[lookupIndex + index]
+					];
+				}
+			})
+			.map(([startHour, endHour]) => {
+				const locationForecastForPeriod = locationForecast.properties.timeseries.find(
+					(entry) => new Date(entry.time).getHours() === startHour
+				).data;
+				const instantForecast = locationForecastForPeriod.instant.details;
+				const next6HoursForecast = locationForecastForPeriod.next_6_hours?.details;
+				return {
+					startHour,
+					endHour,
+					label: `${startHour < 10 ? `0${startHour}` : startHour}-${endHour < 10 ? `0${endHour}` : endHour}`,
+					precipitation: next6HoursForecast.precipitation_amount,
+					symbol: locationForecastForPeriod.next_6_hours?.summary?.symbol_code,
+					temperature: instantForecast.air_temperature,
+					windStrength: instantForecast.wind_speed,
+					locationForecastForPeriod
+				};
+			});
+		// console.log('Timeseries for forecast', forecast);
 		weatherData = {
 			now: {
 				precipitation: hasRadarCoverage(nowCastData)
@@ -50,9 +92,19 @@
 						}
 					: undefined,
 				error: hasRadarCoverage(nowCastData) ? undefined : 'No radar coverage'
-			},
-			forecast: locationForecast.properties.timeseries.map((entry) => {
-				const time = entry.time;
+			}
+			/* forecastData: locationForecast.properties.timeseries.map((entry) => {
+				const dateFormatter = new Intl.DateTimeFormat('no-NO', {
+					year: 'numeric',
+					month: '2-digit',
+					day: '2-digit',
+					hour: '2-digit',
+					minute: '2-digit',
+					timeZone: 'Europe/Oslo'
+				});
+				const time = dateFormatter.format(new Date(entry.time));
+				const isoTime = new Date(entry.time).toISOString();
+				const originalTime = entry.time;
 				const instant = entry.data.instant;
 				const temperature = instant.details.air_temperature;
 				const next_1_hours = entry.data.next_1_hours;
@@ -60,13 +112,15 @@
 				const precipitation = next_1_hours?.details.precipitation_amount;
 				return {
 					time,
+					isoTime,
+					originalTime,
 					symbol,
 					precipitation,
 					temperature
 				};
-			})
+			})*/
 		};
-		console.log('Formatted weather data', weatherData); // TODO: Remove when done with implementation
+		// console.log('Formatted weather data', weatherData); // TODO: Remove when done with implementation
 	});
 </script>
 
@@ -87,6 +141,7 @@
 						windStrength={weatherData.now.wind?.strength}
 					/>
 				</div>
+				<WeatherForecastTable {forecast} />
 			</div>
 		{/if}
 		<!-- Add YR weather widget for inspiration while developing my own -->
