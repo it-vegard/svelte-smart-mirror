@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { asset } from '$app/paths';
 	import { mapWeatherSymbolToIcon, type WeatherSymbolKeyT } from '$lib/utils/weather-utils';
-	import Image from './Image.svelte';
+	import Image from '../Image.svelte';
 
 	export let symbol: WeatherSymbolKeyT | undefined;
 	export let temperature: number | undefined;

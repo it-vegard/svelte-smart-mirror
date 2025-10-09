@@ -3,37 +3,42 @@
 	import { fetchLocationForecast, fetchNowCast, type NowCastDataT } from '$lib/api.yr';
 	import { mapWeatherSymbolToIcon, type WeatherSymbolKeyT } from '$lib/utils/weather-utils';
 	import { onMount } from 'svelte';
-	import Icon from './Icon.svelte';
+	import Icon from '../Icon.svelte';
 	import WeatherSymbolAndTemperature from './WeatherSymbolAndTemperature.svelte';
 	import WeatherDetails from './WeatherDetails.svelte';
 	import WeatherForecastTable from './WeatherForecastTable.svelte';
 
+	type ForecastPeriodT = {
+		startHour: number;
+		endHour: number;
+		label: string;
+		precipitation: number | undefined;
+		symbol: WeatherSymbolKeyT | undefined;
+		temperature: number | undefined;
+		windStrength: number | undefined;
+	};
+
 	type FormattedWeather = {
-		now: {
-			temperature?: number;
-			symbol?: WeatherSymbolKeyT;
-			error?: string;
-		};
-		forecast: {
-			time: string;
-			symbol: WeatherSymbolKeyT | undefined;
-			precipitation: number | undefined;
-			temperature: number | undefined;
-		}[];
+		now:
+			| {
+					precipitation: number;
+					wind: {
+						strength: number;
+						direction: number;
+						gusts: number;
+					};
+					temperature: number;
+					symbol: WeatherSymbolKeyT;
+			  }
+			| undefined;
+		forecast: ForecastPeriodT[];
+		error: string;
 	} | null;
 
 	const hasRadarCoverage = (data: NowCastDataT) => data.properties.meta.radar_coverage === 'ok';
 
 	let weatherData: FormattedWeather = null;
-	let forecast: {
-		startHour: number;
-		endHour: number;
-		label: string;
-		precipitation: number | undefined;
-		symbol: string | undefined;
-		temperature: number | undefined;
-		windStrength: number | undefined;
-	}[];
+	let forecast: ForecastPeriodT[];
 
 	onMount(async () => {
 		const currentHour = new Date().getHours();
@@ -57,42 +62,38 @@
 			.map(([startHour, endHour]) => {
 				const locationForecastForPeriod = locationForecast.properties.timeseries.find(
 					(entry) => new Date(entry.time).getHours() === startHour
-				).data;
-				const instantForecast = locationForecastForPeriod.instant.details;
-				const next6HoursForecast = locationForecastForPeriod.next_6_hours?.details;
+				)?.data;
+				const instantForecast = locationForecastForPeriod?.instant.details;
+				const next6HoursForecast = locationForecastForPeriod?.next_6_hours?.details;
 				return {
 					startHour,
 					endHour,
 					label: `${startHour < 10 ? `0${startHour}` : startHour}-${endHour < 10 ? `0${endHour}` : endHour}`,
-					precipitation: next6HoursForecast.precipitation_amount,
-					symbol: locationForecastForPeriod.next_6_hours?.summary?.symbol_code,
-					temperature: instantForecast.air_temperature,
-					windStrength: instantForecast.wind_speed,
+					precipitation: next6HoursForecast?.precipitation_amount,
+					symbol: locationForecastForPeriod?.next_6_hours?.summary?.symbol_code,
+					temperature: instantForecast?.air_temperature,
+					windStrength: instantForecast?.wind_speed,
 					locationForecastForPeriod
 				};
 			});
 		// console.log('Timeseries for forecast', forecast);
 		weatherData = {
-			now: {
-				precipitation: hasRadarCoverage(nowCastData)
-					? nowCastData.properties.timeseries[0].data.next_1_hours.details.precipitation_amount
-					: undefined,
-				temperature: hasRadarCoverage(nowCastData)
-					? nowCastData.properties.timeseries[0].data.instant.details.air_temperature
-					: undefined,
-				symbol: hasRadarCoverage(nowCastData)
-					? nowCastData.properties.timeseries[0].data.next_1_hours.summary.symbol_code
-					: undefined,
-				wind: hasRadarCoverage(nowCastData)
-					? {
+			now: hasRadarCoverage(nowCastData)
+				? {
+						precipitation:
+							nowCastData.properties.timeseries[0].data.next_1_hours.details.precipitation_amount,
+						temperature: nowCastData.properties.timeseries[0].data.instant.details.air_temperature,
+						symbol: nowCastData.properties.timeseries[0].data.next_1_hours.summary.symbol_code,
+						wind: {
 							strength: nowCastData.properties.timeseries[0].data.instant.details.wind_speed,
 							direction:
 								nowCastData.properties.timeseries[0].data.instant.details.wind_from_direction,
 							gusts: nowCastData.properties.timeseries[0].data.instant.details.wind_speed_of_gust
 						}
-					: undefined,
-				error: hasRadarCoverage(nowCastData) ? undefined : 'No radar coverage'
-			}
+					}
+				: undefined,
+			error: !hasRadarCoverage(nowCastData) ? 'Ingen radardekning for området' : '',
+			forecast
 			/* forecastData: locationForecast.properties.timeseries.map((entry) => {
 				const dateFormatter = new Intl.DateTimeFormat('no-NO', {
 					year: 'numeric',
@@ -127,19 +128,21 @@
 {#if weatherData}
 	<div>
 		<h2>Været nå</h2>
-		{#if weatherData.now.error}
-			<p>{weatherData.now.error}</p>
-		{:else}
+		{#if weatherData.error}
+			<p>{weatherData.error}</p>
+		{:else if weatherData.now && weatherData.forecast}
 			<div style="width: fit-content;">
 				<div style="display: flex; flex-direction: row; gap: 10rem; align-items: center;">
-					<WeatherSymbolAndTemperature
-						symbol={weatherData.now.symbol}
-						temperature={weatherData.now.temperature}
-					/>
-					<WeatherDetails
-						precipitationAmount={weatherData.now.precipitation}
-						windStrength={weatherData.now.wind?.strength}
-					/>
+					{#if weatherData.now}
+						<WeatherSymbolAndTemperature
+							symbol={weatherData.now.symbol}
+							temperature={weatherData.now.temperature}
+						/>
+						<WeatherDetails
+							precipitationAmount={weatherData.now.precipitation}
+							windStrength={weatherData.now.wind?.strength}
+						/>
+					{/if}
 				</div>
 				<WeatherForecastTable {forecast} />
 			</div>
