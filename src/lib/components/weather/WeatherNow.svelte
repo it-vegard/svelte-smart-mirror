@@ -127,12 +127,11 @@
 
 {#if weatherData}
 	<div>
-		<h2>Været nå</h2>
 		{#if weatherData.error}
 			<p>{weatherData.error}</p>
 		{:else if weatherData.now && weatherData.forecast}
 			<div style="width: fit-content;">
-				<div style="display: flex; flex-direction: row; gap: 10rem; align-items: center;">
+				<div style="display: flex; flex-direction: row; gap: 3rem; align-items: center;">
 					{#if weatherData.now}
 						<WeatherSymbolAndTemperature
 							symbol={weatherData.now.symbol}
