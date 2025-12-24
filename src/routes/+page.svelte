@@ -26,7 +26,11 @@
 			'weather transport';
 		gap: 1rem 20rem;
 		padding: 1rem;
-		justify-content: baseline;
+		justify-content: space-between;
+		align-content: space-between;
+		width: 100%;
+		height: 100%;
+		box-sizing: border-box;
 	}
 
 	.slot:nth-child(1) {

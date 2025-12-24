@@ -37,7 +37,7 @@
 
 {#if stopPlaceName}
 	<div class="entur-tavla">
-		<h2 class="entur-tavla__title">{stopPlaceName}</h2>
+		<h2 class="entur-tavla__title">Fra {stopPlaceName} mot sentrum</h2>
 		{#each estimatedCalls as call}
 			<div class="entur-tavla__departure">
 				<span class="entur-tavla__departure__destination">
