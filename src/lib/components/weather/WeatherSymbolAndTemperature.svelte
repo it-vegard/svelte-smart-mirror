@@ -28,14 +28,14 @@
 	.weather__temperature {
 		color: var(--temperature-color);
 		font-weight: bold;
-		font-size: 3rem;
+		font-size: calc(var(--font-size) * 3);
 		margin: 0;
 	}
 	.weather-symbol-and-temperature {
 		display: flex;
 		align-items: center;
 		gap: 1rem;
-		font-size: 1.2rem;
+		font-size: calc(var(--font-size) * 1.2);
 		/* Add more styles as needed */
 	}
 	.weather-symbol {
