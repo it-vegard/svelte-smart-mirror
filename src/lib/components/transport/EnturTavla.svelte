@@ -6,10 +6,11 @@
 
 	export let stopId: string;
 	let stopPlaceName: string;
-	let estimatedCalls: {
+	let departures: {
 		expectedDepartureTime: string;
-		destinationDisplay: { frontText: string };
+		destination: string;
 		transportMode: 'bus' | 'metro';
+		lineNumber: string;
 	}[];
 	let loaderTimeout: NodeJS.Timeout | undefined;
 	let cleanupOldDeparturesTimeout: NodeJS.Timeout | undefined;
@@ -18,23 +19,8 @@
 		async function loadDepartures() {
 			// Fetch data for the given stopId
 			const result = await fetchStop(stopId);
-			stopPlaceName = result.data.stopPlace.name;
-			estimatedCalls = result.data.stopPlace.estimatedCalls
-				.filter(
-					(call: { destinationDisplay: { frontText: string } }) =>
-						!['Bergkrystallen', 'Mortensrud'].includes(call.destinationDisplay.frontText)
-				)
-				.map(
-					(call: {
-						expectedDepartureTime: string;
-						destinationDisplay: { frontText: string };
-						quay: { stopPlace: { transportMode: string } };
-					}) => ({
-						expectedDepartureTime: call.expectedDepartureTime,
-						destinationDisplay: call.destinationDisplay,
-						transportMode: call.quay.stopPlace.transportMode[0]
-					})
-				);
+			stopPlaceName = result.name;
+			departures = result.departures;
 		}
 		await loadDepartures();
 		loaderTimeout = setInterval(async () => {
@@ -44,7 +30,9 @@
 		// Clean up old departures every minute
 		cleanupOldDeparturesTimeout = setInterval(() => {
 			const now = new Date();
-			estimatedCalls = estimatedCalls.filter((call) => new Date(call.expectedDepartureTime) > now);
+			departures = departures.filter(
+				(departure) => new Date(departure.expectedDepartureTime) > now
+			);
 		}, 60000); // Clean up every 1 minute
 	});
 
@@ -61,18 +49,19 @@
 {#if stopPlaceName}
 	<div class="entur-tavla">
 		<h2 class="entur-tavla__title">Fra {stopPlaceName} mot sentrum</h2>
-		{#each estimatedCalls as call}
+		{#each departures as departure}
 			<div class="entur-tavla__departure">
 				<span class="entur-tavla__departure__destination">
-					{#if call.transportMode === 'bus'}
+					{#if departure.transportMode === 'bus'}
 						<BusIcon />
-					{:else if call.transportMode === 'metro'}
+					{:else if departure.transportMode === 'metro'}
 						<MetroIcon />
 					{/if}
-					{call.destinationDisplay.frontText}
+					<span class="entur-tavla__departure__line-number">{departure.lineNumber}</span>
+					{departure.destination}
 				</span>
 				<span class="entur-tavla__departure__time"
-					>{new Date(call.expectedDepartureTime).toLocaleTimeString([], {
+					>{new Date(departure.expectedDepartureTime).toLocaleTimeString([], {
 						hour: '2-digit',
 						minute: '2-digit'
 					})}</span
@@ -99,6 +88,10 @@
 		gap: 0 1rem;
 		font-size: 1.5rem;
 		justify-content: space-between;
+	}
+	.entur-tavla__departure__line-number {
+		width: 2.5rem;
+		text-align: right;
 	}
 	.entur-tavla__departure__destination {
 		display: flex;

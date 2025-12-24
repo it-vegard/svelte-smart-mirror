@@ -15,6 +15,11 @@ const fetchStop = query(v.string(), async (stopPlaceId: string) => {
                         transportMode
                     }
                 }
+				serviceJourney {
+					line {
+						publicCode
+					}
+				}
             }
         }
     }`;
@@ -27,12 +32,42 @@ const fetchStop = query(v.string(), async (stopPlaceId: string) => {
 			'Content-Type': 'application/json'
 		},
 		body: JSON.stringify({ query: stopPlaceQuery })
-	}).then((res) => {
+	})
+		.then((res) => {
 		if (!res.ok) {
 			throw new Error('Network response was not ok', { cause: res });
 		} else {
 			return res.json();
 		}
+		})
+		.then((data) => {
+			const stopPlace = data.data.stopPlace;
+			if (!stopPlace) {
+				throw new Error('Stop place not found');
+			}
+			return {
+				name: stopPlace.name,
+				departures: stopPlace.estimatedCalls
+					.filter(
+						(call: { destinationDisplay: { frontText: string } }) =>
+							!['Bergkrystallen', 'Mortensrud'].includes(call.destinationDisplay.frontText)
+					)
+					.map(
+						(call: {
+							expectedDepartureTime: string;
+							destinationDisplay: { frontText: string };
+							quay: { stopPlace: { transportMode: string } };
+							serviceJourney: { line: { publicCode: string } };
+						}) => {
+							return {
+								expectedDepartureTime: call.expectedDepartureTime,
+								destination: call.destinationDisplay.frontText,
+								transportMode: call.quay.stopPlace.transportMode[0],
+								lineNumber: call.serviceJourney.line.publicCode
+							};
+						}
+					)
+			};
 	});
 	return stopPlaceData;
 });
