@@ -56,12 +56,13 @@
 	.weather-forecast-table {
 		border-collapse: collapse;
 		width: 100%;
+		font-size: 1.5rem;
 	}
 	.weather-forecast-table th {
 		color: transparent;
 	}
 	.weather-forecast-table tr > :first-child {
-		width: 3rem;
+		width: 5rem;
 		text-align: left;
 	}
 	.weather-forecast-table tr > :not(:first-child) {
