@@ -1,0 +1,38 @@
+<script lang="ts">
+	import { onMount, onDestroy } from 'svelte';
+
+	// Reactive variable to hold the current time
+	let currentTime = new Date();
+	let intervalId: NodeJS.Timeout | undefined;
+
+	onMount(() => {
+		// Update the time every second
+		intervalId = setInterval(() => {
+			currentTime = new Date();
+		}, 1000);
+	});
+
+	onDestroy(() => {
+		// Clear the interval when the component is removed
+		if (intervalId) {
+			clearInterval(intervalId);
+		}
+	});
+
+	// Derived reactive variables for display formatting
+	$: hours = currentTime.getHours().toString().padStart(2, '0');
+	$: minutes = currentTime.getMinutes().toString().padStart(2, '0');
+	$: seconds = currentTime.getSeconds().toString().padStart(2, '0');
+</script>
+
+<div class="clock">
+	{hours}:{minutes}:{seconds}
+</div>
+
+<style>
+	.clock {
+		font-family: monospace;
+		font-size: 5rem;
+		display: inline-block;
+	}
+</style>
