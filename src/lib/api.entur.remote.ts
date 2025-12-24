@@ -5,7 +5,7 @@ const fetchStop = query(v.string(), async (stopPlaceId: string) => {
 	const stopPlaceQuery = `{
         stopPlace(id: "NSR:StopPlace:${stopPlaceId}") {
             name(language: "nb")
-            estimatedCalls(numberOfDeparturesPerLineAndDestinationDisplay: 10) {
+            estimatedCalls(numberOfDepartures: 10) {
                 expectedDepartureTime
                 destinationDisplay {
                     frontText
@@ -34,11 +34,11 @@ const fetchStop = query(v.string(), async (stopPlaceId: string) => {
 		body: JSON.stringify({ query: stopPlaceQuery })
 	})
 		.then((res) => {
-		if (!res.ok) {
-			throw new Error('Network response was not ok', { cause: res });
-		} else {
-			return res.json();
-		}
+			if (!res.ok) {
+				throw new Error('Network response was not ok', { cause: res });
+			} else {
+				return res.json();
+			}
 		})
 		.then((data) => {
 			const stopPlace = data.data.stopPlace;
@@ -68,7 +68,7 @@ const fetchStop = query(v.string(), async (stopPlaceId: string) => {
 						}
 					)
 			};
-	});
+		});
 	return stopPlaceData;
 });
 
