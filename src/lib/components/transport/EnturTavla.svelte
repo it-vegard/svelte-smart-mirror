@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { fetchStop } from '$lib/api.entur.remote';
 	import BusIcon from '$lib/icons/BusIcon.svelte';
 	import MetroIcon from '$lib/icons/MetroIcon.svelte';
@@ -11,27 +11,50 @@
 		destinationDisplay: { frontText: string };
 		transportMode: 'bus' | 'metro';
 	}[];
+	let loaderTimeout: NodeJS.Timeout | undefined;
+	let cleanupOldDeparturesTimeout: NodeJS.Timeout | undefined;
 
 	onMount(async () => {
-		// Fetch data for the given stopId
-		const result = await fetchStop(stopId);
-		stopPlaceName = result.data.stopPlace.name;
-		estimatedCalls = result.data.stopPlace.estimatedCalls
-			.filter(
-				(call: { destinationDisplay: { frontText: string } }) =>
-					!['Bergkrystallen', 'Mortensrud'].includes(call.destinationDisplay.frontText)
-			)
-			.map(
-				(call: {
-					expectedDepartureTime: string;
-					destinationDisplay: { frontText: string };
-					quay: { stopPlace: { transportMode: string } };
-				}) => ({
-					expectedDepartureTime: call.expectedDepartureTime,
-					destinationDisplay: call.destinationDisplay,
-					transportMode: call.quay.stopPlace.transportMode[0]
-				})
-			);
+		async function loadDepartures() {
+			// Fetch data for the given stopId
+			const result = await fetchStop(stopId);
+			stopPlaceName = result.data.stopPlace.name;
+			estimatedCalls = result.data.stopPlace.estimatedCalls
+				.filter(
+					(call: { destinationDisplay: { frontText: string } }) =>
+						!['Bergkrystallen', 'Mortensrud'].includes(call.destinationDisplay.frontText)
+				)
+				.map(
+					(call: {
+						expectedDepartureTime: string;
+						destinationDisplay: { frontText: string };
+						quay: { stopPlace: { transportMode: string } };
+					}) => ({
+						expectedDepartureTime: call.expectedDepartureTime,
+						destinationDisplay: call.destinationDisplay,
+						transportMode: call.quay.stopPlace.transportMode[0]
+					})
+				);
+		}
+		await loadDepartures();
+		loaderTimeout = setInterval(async () => {
+			await loadDepartures();
+		}, 300000); // Refresh every 5 minutes
+
+		// Clean up old departures every minute
+		cleanupOldDeparturesTimeout = setInterval(() => {
+			const now = new Date();
+			estimatedCalls = estimatedCalls.filter((call) => new Date(call.expectedDepartureTime) > now);
+		}, 60000); // Clean up every 1 minute
+	});
+
+	onDestroy(() => {
+		if (loaderTimeout) {
+			clearInterval(loaderTimeout);
+		}
+		if (cleanupOldDeparturesTimeout) {
+			clearInterval(cleanupOldDeparturesTimeout);
+		}
 	});
 </script>
 
