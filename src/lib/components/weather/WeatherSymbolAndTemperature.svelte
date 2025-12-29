@@ -40,7 +40,6 @@
 		align-items: center;
 		gap: 1rem;
 		font-size: var(--font-size--medium);
-		/* Add more styles as needed */
 	}
 	.weather-symbol {
 		width: var(--font-size--xlarge);

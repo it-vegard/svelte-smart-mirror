@@ -1,9 +1,7 @@
 <script lang="ts">
-	import { asset } from '$app/paths';
 	import { fetchLocationForecast, fetchNowCast, type NowCastDataT } from '$lib/api.yr';
-	import { mapWeatherSymbolToIcon, type WeatherSymbolKeyT } from '$lib/utils/weather-utils';
+	import { type WeatherSymbolKeyT } from '$lib/utils/weather-utils';
 	import { onMount } from 'svelte';
-	import Icon from '../Icon.svelte';
 	import WeatherSymbolAndTemperature from './WeatherSymbolAndTemperature.svelte';
 	import WeatherDetails from './WeatherDetails.svelte';
 	import WeatherForecastTable from './WeatherForecastTable.svelte';
@@ -44,8 +42,6 @@
 		const currentHour = new Date().getHours();
 		const nowCastData = await fetchNowCast();
 		const locationForecast = await fetchLocationForecast();
-		// console.log('NowCast', nowCastData); // TODO: Remove when done with implementation
-		// console.log('Forecast', locationForecast); // TODO: Remove when done with implementation
 		const timeseriesHoursLookupArray = [0, 6, 12, 18, 0, 6, 12, 18, 0]; // To cover 24 hours ahead
 		const firstTimeEnd = timeseriesHoursLookupArray.find((hour) => hour >= currentHour) ?? 0;
 		forecast = [0, 1, 2, 3]
@@ -76,7 +72,6 @@
 					locationForecastForPeriod
 				};
 			});
-		// console.log('Timeseries for forecast', forecast);
 		weatherData = {
 			now: hasRadarCoverage(nowCastData)
 				? {
@@ -94,34 +89,7 @@
 				: undefined,
 			error: !hasRadarCoverage(nowCastData) ? 'Ingen radardekning for området' : '',
 			forecast
-			/* forecastData: locationForecast.properties.timeseries.map((entry) => {
-				const dateFormatter = new Intl.DateTimeFormat('no-NO', {
-					year: 'numeric',
-					month: '2-digit',
-					day: '2-digit',
-					hour: '2-digit',
-					minute: '2-digit',
-					timeZone: 'Europe/Oslo'
-				});
-				const time = dateFormatter.format(new Date(entry.time));
-				const isoTime = new Date(entry.time).toISOString();
-				const originalTime = entry.time;
-				const instant = entry.data.instant;
-				const temperature = instant.details.air_temperature;
-				const next_1_hours = entry.data.next_1_hours;
-				const symbol = next_1_hours?.summary?.symbol_code;
-				const precipitation = next_1_hours?.details.precipitation_amount;
-				return {
-					time,
-					isoTime,
-					originalTime,
-					symbol,
-					precipitation,
-					temperature
-				};
-			})*/
 		};
-		// console.log('Formatted weather data', weatherData); // TODO: Remove when done with implementation
 	});
 </script>
 

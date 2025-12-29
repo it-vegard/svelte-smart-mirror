@@ -9,10 +9,6 @@
 		return new Promise((resolve) => {
 			fetch(svgRoute)
 				.then((response) => response.text())
-				.then((svg) => {
-					console.log('Fetched SVG:', svg);
-					return svg;
-				})
 				.then((svg) => resolve(svg));
 		});
 	}
