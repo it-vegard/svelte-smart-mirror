@@ -24,13 +24,14 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
-		font-size: 1.1rem;
+		font-size: var(--font-size--base);
 	}
 
 	.weather-details__item {
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
-		font-size: 1.5rem;
+		font-size: var(--font-size--base);
+		width: fit-content;
 	}
 </style>

@@ -77,24 +77,31 @@
 <style>
 	.entur-tavla {
 		font-family: sans-serif;
+		max-width: fit-content;
 	}
 	.entur-tavla__title {
-		font-size: 2rem;
+		font-size: var(--font-size--heading);
+		text-wrap: nowrap;
 	}
 	.entur-tavla__departure {
 		display: flex;
 		margin-bottom: 0.5rem;
 		padding: 4px 0;
 		gap: 0 1rem;
-		font-size: 1.5rem;
+		font-size: var(--font-size--base);
 		justify-content: space-between;
 	}
 	.entur-tavla__departure__line-number {
-		width: 2.5rem;
+		width: 3ch;
 		text-align: right;
 	}
 	.entur-tavla__departure__destination {
 		display: flex;
-		gap: 1rem;
+		gap: 0.5rem;
+		text-wrap: nowrap;
+	}
+	.entur-tavla__departure__time {
+		width: 5ch;
+		text-align: right;
 	}
 </style>

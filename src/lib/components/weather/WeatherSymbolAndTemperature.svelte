@@ -5,6 +5,10 @@
 
 	export let symbol: WeatherSymbolKeyT | undefined;
 	export let temperature: number | undefined;
+
+	const mainElement = document.getElementsByTagName('main')[0];
+	const fontSize = window.getComputedStyle(mainElement).getPropertyValue('font-size');
+	export const symbolSize = Number.parseInt(fontSize.replace('px', '')) * 4;
 </script>
 
 {#if symbol && temperature}
@@ -12,7 +16,7 @@
 		{#if symbol}
 			<div class="weather-symbol">
 				<Image
-					size={96}
+					size={symbolSize}
 					src={asset(`/weather-symbols/darkmode/svg/${mapWeatherSymbolToIcon(symbol)}.svg`)}
 					alt={symbol}
 				/>
@@ -28,19 +32,19 @@
 	.weather__temperature {
 		color: var(--temperature-color);
 		font-weight: bold;
-		font-size: calc(var(--font-size) * 3);
+		font-size: var(--font-size--large);
 		margin: 0;
 	}
 	.weather-symbol-and-temperature {
 		display: flex;
 		align-items: center;
 		gap: 1rem;
-		font-size: calc(var(--font-size) * 1.2);
+		font-size: var(--font-size--medium);
 		/* Add more styles as needed */
 	}
 	.weather-symbol {
-		width: 96px;
-		height: 96px;
+		width: var(--font-size--xlarge);
+		height: var(--font-size--xlarge);
 		margin-left: -23px;
 	}
 </style>

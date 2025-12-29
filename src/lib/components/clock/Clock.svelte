@@ -40,10 +40,11 @@
 <style>
 	.clock {
 		font-family: monospace;
-		font-size: 5rem;
+		font-size: var(--font-size--xlarge);
 		display: inline-block;
 	}
 	.date {
+		font-size: var(--font-size--medium);
 		margin-top: 0.5rem;
 		text-transform: capitalize;
 	}

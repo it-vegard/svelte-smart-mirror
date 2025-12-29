@@ -26,7 +26,13 @@
 	<tbody>
 		{#each forecast as forecastPeriod}
 			<tr>
-				<td>{forecastPeriod.label}</td>
+				<td>
+					<span class="weather-forecast-table__time-label">
+						<span>{forecastPeriod.label.split('-')[0]}</span>
+						-
+						<span>{forecastPeriod.label.split('-')[1]}</span>
+					</span>
+				</td>
 				<td>
 					{#if forecastPeriod.symbol !== undefined}
 						<Image
@@ -56,17 +62,36 @@
 	.weather-forecast-table {
 		border-collapse: collapse;
 		width: 100%;
-		font-size: 1.5rem;
+		font-size: var(--font-size--base);
 	}
 	.weather-forecast-table th {
 		color: transparent;
 	}
-	.weather-forecast-table tr > :first-child {
-		width: 5rem;
-		text-align: left;
+	.weather-forecast-table td {
+		padding-right: 1rem;
 	}
-	.weather-forecast-table tr > :not(:first-child) {
+	.weather-forecast-table tr > :first-child {
+		width: 5ch;
+	}
+	.weather-forecast-table__time-label {
+		display: flex;
+		justify-content: space-between;
+		gap: 0.5ch;
+	}
+	.weather-forecast-table__time-label span:first-child,
+	.weather-forecast-table__time-label span:last-child {
+		text-align: right;
+		width: 2ch;
+	}
+	.weather-forecast-table tr > :nth-child(2) {
+		text-align: center;
+		width: 2rem;
+	}
+	.weather-forecast-table tr > :nth-child(n + 3) {
 		width: auto;
 		text-align: right;
+	}
+	.weather-forecast-table tr > :last-child {
+		padding-right: 0;
 	}
 </style>

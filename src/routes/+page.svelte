@@ -18,7 +18,12 @@
 
 <style :global>
 	:root {
-		--font-size: 16px;
+		--font-size--base: clamp(16px, 5vw, 28px);
+		--font-size--heading: calc(var(--font-size--base) * 1.3);
+		--font-size--xlarge: calc(var(--font-size--base) * 3.5);
+		--font-size--large: calc(var(--font-size--base) * 2.5);
+		--font-size--medium: calc(var(--font-size--base) * 1.25);
+		--font-size--small: calc(var(--font-size--base) * 0.75);
 	}
 
 	main {
@@ -26,14 +31,17 @@
 		flex-direction: column;
 		align-items: center;
 		gap: 3rem;
-		padding: 1rem;
 		width: 100%;
 		height: 100%;
 		box-sizing: border-box;
-		font-size: calc(var(--font-size) * 0.5);
+		font-size: var(--font-size--base);
 	}
 
-	@media (min-width: 960px) {
+	@media (min-width: 762px) {
+		:root {
+			--font-size--base: 20px;
+		}
+
 		main {
 			display: grid;
 			grid-template-columns: 1fr 1fr;
@@ -41,20 +49,34 @@
 			grid-template-areas:
 				'clock clock'
 				'transport weather';
-			gap: 3rem;
+			gap: 2rem;
 			padding: 0.5rem;
 			margin: 0 auto;
 			justify-content: space-between;
 			align-content: space-between;
-			font-size: var(--font-size);
+		}
+	}
+
+	@media (min-width: 960px) {
+		:root {
+			--font-size--base: 22px;
+		}
+
+		main {
+			padding: 3rem;
 		}
 	}
 
 	@media (min-width: 1400px) {
+		:root {
+			--font-size--base: 30px;
+		}
+
 		main {
-			gap: 3rem 20rem;
+			--font-size--base: 30px;
+			gap: 3rem 15rem;
 			padding: 1rem;
-			max-width: 1200px;
+			max-width: 80%;
 		}
 	}
 
