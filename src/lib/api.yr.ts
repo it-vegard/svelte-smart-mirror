@@ -1,3 +1,4 @@
+import { PUBLIC_HOME_LATITUDE, PUBLIC_HOME_LONGITUDE } from '$env/static/public';
 import type { WeatherSymbolKeyT } from './utils/weather-utils';
 
 type NowCastDataT = {
@@ -62,8 +63,8 @@ type LocationForecastDataT = {
 	};
 };
 
-const homeLat = 59.88309870407893;
-const homeLon = 10.808853854138906;
+const homeLat = PUBLIC_HOME_LATITUDE;
+const homeLon = PUBLIC_HOME_LONGITUDE;
 
 const getYrUrl = (typeOfForecast: string) =>
 	`https://api.met.no/weatherapi/${typeOfForecast}/2.0/complete.json`;

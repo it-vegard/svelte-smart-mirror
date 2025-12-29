@@ -1,7 +1,8 @@
-<script>
+<script lang="ts">
 	import Clock from '$lib/components/clock/Clock.svelte';
 	import EnturTavla from '$lib/components/transport/EnturTavla.svelte';
 	import WeatherNow from '$lib/components/weather/WeatherNow.svelte';
+	import { PUBLIC_ENTUR_STOP_PLACE_ID } from '$env/static/public';
 </script>
 
 <main>
@@ -12,7 +13,7 @@
 		<WeatherNow />
 	</div>
 	<div class="transport">
-		<EnturTavla stopId="58246" />
+		<EnturTavla stopId={PUBLIC_ENTUR_STOP_PLACE_ID} />
 	</div>
 </main>
 

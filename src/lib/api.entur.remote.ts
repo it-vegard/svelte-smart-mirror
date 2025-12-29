@@ -1,11 +1,20 @@
 import * as v from 'valibot';
 import { query } from '$app/server';
+import {
+	PUBLIC_ENTUR_API_CLIENT_NAME,
+	PUBLIC_ENTUR_IGNORED_LINES,
+	PUBLIC_ENTUR_NUMBER_OF_DEPARTURES,
+	PUBLIC_LANGUAGE
+} from '$env/static/public';
+
+const language = PUBLIC_LANGUAGE || 'nb';
+const numberOfDepartures = parseInt(PUBLIC_ENTUR_NUMBER_OF_DEPARTURES) || 10;
 
 const fetchStop = query(v.string(), async (stopPlaceId: string) => {
 	const stopPlaceQuery = `{
         stopPlace(id: "NSR:StopPlace:${stopPlaceId}") {
-            name(language: "nb")
-            estimatedCalls(numberOfDepartures: 10) {
+            name(language: "${language}")
+            estimatedCalls(numberOfDepartures: ${numberOfDepartures}) {
                 expectedDepartureTime
                 destinationDisplay {
                     frontText
@@ -28,7 +37,7 @@ const fetchStop = query(v.string(), async (stopPlaceId: string) => {
 		method: 'POST',
 		headers: {
 			// Replace this with your own client name:
-			'ET-Client-Name': 'vha-smart-mirror',
+			'ET-Client-Name': PUBLIC_ENTUR_API_CLIENT_NAME,
 			'Content-Type': 'application/json'
 		},
 		body: JSON.stringify({ query: stopPlaceQuery })
@@ -40,8 +49,8 @@ const fetchStop = query(v.string(), async (stopPlaceId: string) => {
 				return res.json();
 			}
 		})
-		.then((data) => {
-			const stopPlace = data.data.stopPlace;
+		.then(({ data }) => {
+			const stopPlace = data.stopPlace;
 			if (!stopPlace) {
 				throw new Error('Stop place not found');
 			}
@@ -50,7 +59,7 @@ const fetchStop = query(v.string(), async (stopPlaceId: string) => {
 				departures: stopPlace.estimatedCalls
 					.filter(
 						(call: { destinationDisplay: { frontText: string } }) =>
-							!['Bergkrystallen', 'Mortensrud'].includes(call.destinationDisplay.frontText)
+							!PUBLIC_ENTUR_IGNORED_LINES.split(',').includes(call.destinationDisplay.frontText)
 					)
 					.map(
 						(call: {
