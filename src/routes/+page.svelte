@@ -3,6 +3,17 @@
 	import EnturTavla from '$lib/components/transport/EnturTavla.svelte';
 	import WeatherNow from '$lib/components/weather/WeatherNow.svelte';
 	import { PUBLIC_ENTUR_STOP_PLACE_ID } from '$env/static/public';
+
+	$effect(() => {
+		const interval = setInterval(
+			() => {
+				window.location.reload();
+			},
+			5 * 60 * 1000
+		); // 5 minutes in milliseconds (5 * 60 * 1000)
+
+		return () => clearInterval(interval);
+	});
 </script>
 
 <main>
